@@ -1,1 +1,148 @@
+# 队列最大值
+import queue
+class MaxQueue:
+    def __init__(self):
+        self.deque = queue.deque()
+        self.queue = queue.Queue()
 
+    def max_value(self) -> int:
+        return self.deque[0] if self.deque else -1
+
+
+    def push_back(self, value: int) -> None:
+        while self.deque and self.deque[-1] < value:
+            self.deque.pop()
+        self.deque.append(value)
+        self.queue.put(value)
+
+    def pop_front(self) -> int:
+        if not self.deque:
+            return -1
+        ans = self.queue.get()
+        if ans == self.deque[0]:
+            self.deque.popleft()
+        return ans
+
+# n个骰子点数
+# 动态转移方程
+class Solution:
+    def dicesProbability(self, n: int) -> List[float]:
+        base = 1/6
+        dp = [[0]*(_*6+1) for _ in range(n+1)]
+        for k in range(1,7):
+            dp[1][k] = base
+        for i in range(2,n+1):
+            for j in range(i,i*6+1):
+                dp[i][j] = sum(dp[i-1][max(1,j-6):j])*base
+        return dp[n][n:]
+
+# 扑克牌顺子
+class Solution:
+    def isStraight(self, nums: List[int]) -> bool:
+        gost=0
+        nums.sort()
+        for i in range(len(nums)-1):
+            if nums[i]==0:
+                gost+=1
+                continue
+            if nums[i+1]==nums[i]:
+                return False
+            if (nums[i+1]-nums[i])!=1:
+                gost-=(nums[i+1]-nums[i]-1)
+        return gost>=0
+
+# 圆圈中最后剩下的数字：初始n人 每次剔除第m人
+class Solution:
+    def lastRemaining(self, n: int, m: int) -> int:
+        f = 0
+        for i in range(1, n+1):
+            f = (f+m)%i
+        return f
+
+
+# 股票的最大利润：买卖一次
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        if not prices: return 0
+        m, res = prices[0], 0
+        for x in prices:
+            m, res = min(m, x), max(res, x - m)
+        return res
+
+# 不用加减乘除做加法
+# sum =（非进位和 n ）+（进位 c ）
+class Solution:
+    def add(self, a: int, b: int) -> int:
+        x = 0xffffffff
+        a, b = a & x, b & x
+        while b != 0:
+            a, b = (a ^ b), (a & b) << 1 & x
+        return a if a <= 0x7fffffff else ~(a ^ x)
+
+
+
+# 构建乘积数组：其中 B[i] 的值是数组 A 中除了下标 i 以外的元素的积
+class Solution:
+    def constructArr(self, a: List[int]) -> List[int]:
+        if not a:
+            return []
+        res = [1] * len(a)
+        for i in range(1, len(a)):
+            res[i] = res[i-1]*a[i-1]
+        r = 1
+        for i in reversed(range(len(a))):
+            res[i] *= r
+            r *= a[i]
+        return res
+
+#把字符串换成整数
+class Solution:
+    def strToInt(self, str: str) -> int:
+        s = str.strip()
+        if not s or s[0] not in '+-0123456789':
+            return 0
+        res = s[0]
+        i = 1
+        while i < len(s):
+            if s[i] in '0123456789':
+                res += s[i]
+                i += 1
+            else:
+                break
+        if res == '+' or res == '-':
+            return 0
+        if int(res) > 2**31 - 1:
+            return 2**31 - 1
+        if int(res) < -2**31:
+            return -2**31
+        return int(res)
+        
+# 二叉搜索树最近公共祖先
+# 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if root is None:
+            return root
+        if p.val == q.val:
+            return p
+        while True:
+            if p.val<root.val and q.val<root.val:
+                root = root.left
+            elif p.val>root.val and q.val>root.val:
+                root = root.right
+            else:
+                return root
+                
+# 二叉树最近公共祖先
+# 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+class Solution:
+    def lowestCommonAncestor(self, root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+        if root==None or root==p or root==q:
+            return(root)
+        left=self.lowestCommonAncestor(root.left,p,q)
+        right=self.lowestCommonAncestor(root.right,p,q)
+        if left==None:
+            return(right)
+        if right==None:
+            return(left)
+        return(root)
